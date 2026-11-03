@@ -1,7 +1,6 @@
 {
   "command.birthday": "Manage your birthday in this server",
   "command.birthdays": "List everyone's birthday in this server",
-  "command.closest_first_option": "Sort by closest upcoming birthday (default); False lists in calendar order",
   "command.admin": "Configure BirthdayBot for this server",
   "command.channel": "Set the birthday announcement channel",
   "command.enabled": "Enable or disable birthday scheduling in this server",

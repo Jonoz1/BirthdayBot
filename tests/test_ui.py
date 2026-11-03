@@ -143,9 +143,6 @@ def test_birthday_list_formats_and_splits():
     }
     title = "**Birthdays in this server**"
     assert birthday_list(rows, now) == ["\n".join([title, lines[4], lines[5], lines[3]])]
-    assert birthday_list(rows, now, closest_first=False) == [
-        "\n".join([title, lines[3], lines[4], lines[5]])
-    ]
     first = f"{title}\n{lines[4]}"
     assert birthday_list(rows, now, limit=len(first) + len(lines[5])) == [
         first,
