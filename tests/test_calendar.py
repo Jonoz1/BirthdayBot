@@ -21,6 +21,17 @@ def test_next_birthday_start_keeps_today_until_local_midnight():
     assert next_birthday_start(1, 1, "UTC", now) == datetime(2028, 1, 1, tzinfo=UTC)
 
 
+def test_next_birthday_start_leap_day_in_non_leap_year():
+    feb_28 = datetime(2027, 2, 28, 12, tzinfo=UTC)
+    assert next_birthday_start(2, 29, "UTC", feb_28) == datetime(2027, 2, 28, tzinfo=UTC)
+    march_1 = datetime(2027, 3, 1, 0, 0, 1, tzinfo=UTC)
+    assert next_birthday_start(2, 29, "UTC", march_1) == datetime(2028, 2, 29, tzinfo=UTC)
+    tokyo_march_1 = datetime(2027, 2, 28, 15, 0, 1, tzinfo=UTC)
+    assert next_birthday_start(2, 29, "Asia/Tokyo", tokyo_march_1) == datetime(
+        2028, 2, 28, 15, tzinfo=UTC
+    )
+
+
 def test_leap_day():
     assert birthday_in_year(2, 29, 2027) == date(2027, 2, 28)
     assert birthday_in_year(2, 29, 2028) == date(2028, 2, 29)
