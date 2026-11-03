@@ -1,6 +1,7 @@
 {
   "command.birthday": "Manage your birthday in this server",
   "command.birthdays": "List everyone's birthday in this server",
+  "command.closest_first_option": "Sort by closest upcoming birthday (default); False lists in calendar order",
   "command.admin": "Configure BirthdayBot for this server",
   "command.channel": "Set the birthday announcement channel",
   "command.enabled": "Enable or disable birthday scheduling in this server",
@@ -24,7 +25,7 @@
   "dashboard.title": "Your birthday settings",
   "dashboard.body": "Birthday: {day:02d}/{month:02d}\nTimezone: {timezone}\nPosting time: {announcement_time}\nParticipation: {status}\nReminders: {reminders}\nMedia: {media}\nSkipped occurrence: {skip}\nServer scheduling: {server}",
   "list.title": "Birthdays in this server",
-  "list.line": "{day:02d}/{month:02d}: <@{user}>",
+  "list.line": "{day:02d}/{month:02d} (<t:{timestamp}:R>): <@{user}>",
   "list.empty": "No birthdays are set up in this server yet. Use /birthday to add yours.",
   "state.active": "Enabled",
   "state.paused": "Paused",

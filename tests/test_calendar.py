@@ -2,7 +2,23 @@ from datetime import UTC, date, datetime, time, timedelta
 
 import pytest
 
-from birthdaybot.calendar import birthday_in_year, due_events, events_for_year, previous_month
+from birthdaybot.calendar import (
+    birthday_in_year,
+    due_events,
+    events_for_year,
+    next_birthday_start,
+    previous_month,
+)
+
+
+def test_next_birthday_start_keeps_today_until_local_midnight():
+    now = datetime(2027, 6, 15, 12, tzinfo=UTC)
+    assert next_birthday_start(6, 15, "UTC", now) == datetime(2027, 6, 15, tzinfo=UTC)
+    assert next_birthday_start(6, 15, "Asia/Tokyo", now) == datetime(2027, 6, 14, 15, tzinfo=UTC)
+    assert next_birthday_start(6, 14, "Asia/Tokyo", now) == datetime(2028, 6, 13, 15, tzinfo=UTC)
+    assert next_birthday_start(6, 16, "Asia/Tokyo", now) == datetime(2027, 6, 15, 15, tzinfo=UTC)
+    assert next_birthday_start(2, 29, "UTC", now) == datetime(2028, 2, 29, tzinfo=UTC)
+    assert next_birthday_start(1, 1, "UTC", now) == datetime(2028, 1, 1, tzinfo=UTC)
 
 
 def test_leap_day():
