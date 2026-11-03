@@ -144,6 +144,15 @@ class Database:
         cursor = await self.execute(f"SELECT {PROFILE_COLUMNS} FROM birthdays")
         return await cursor.fetchall()
 
+    async def guild_birthdays(self, guild_id: int):
+        cursor = await self.execute(
+            """SELECT user_id, month, day FROM birthdays
+               WHERE guild_id = %s AND enabled AND left_at IS NULL
+               ORDER BY month, day, user_id""",
+            (guild_id,),
+        )
+        return await cursor.fetchall()
+
     async def membership(self, guild_id: int, user_id: int, present: bool):
         await self.execute(
             """UPDATE birthdays SET left_at = CASE WHEN %s THEN NULL

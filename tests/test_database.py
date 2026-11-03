@@ -61,6 +61,20 @@ async def test_profile_isolation_media_and_pause(db):
     assert await db.get_profile(4, 2) is not None
 
 
+async def test_guild_birthdays_lists_active_members_by_date(db):
+    await seed(db)
+    await db.save_profile(1, 5, 1, 9, "UTC", [], None, None)
+    await db.save_profile(1, 6, 3, 3, "UTC", [], None, None)
+    await db.save_profile(1, 7, 4, 4, "UTC", [], None, None)
+    await seed(db, 4)
+    await db.set_enabled(1, 6, False)
+    await db.membership(1, 7, False)
+    assert await db.guild_birthdays(1) == [
+        {"user_id": 5, "month": 1, "day": 9},
+        {"user_id": 2, "month": 5, "day": 1},
+    ]
+
+
 async def test_atomic_claim_and_control_states(db):
     profile = await seed(db)
     event = Event("birthday", date(2027, 5, 1), datetime(2027, 5, 1, 12, tzinfo=UTC))
