@@ -561,6 +561,21 @@ def channel_usable(channel, member) -> bool:
     )
 
 
+def birthday_list(rows: list[dict], limit: int = 2000) -> list[str]:
+    if not rows:
+        return [t("list.empty")]
+    pages, page = [], "**" + t("list.title") + "**"
+    for row in rows:
+        line = t("list.line", day=row["day"], month=row["month"], user=row["user_id"])
+        if len(page) + 1 + len(line) > limit:
+            pages.append(page)
+            page = line
+        else:
+            page += "\n" + line
+    pages.append(page)
+    return pages
+
+
 def register_commands(bot):
     @bot.tree.command(name="birthday", description=t("command.birthday"))
     @app_commands.guild_only()
@@ -581,6 +596,14 @@ def register_commands(bot):
                 bot, interaction.guild_id, target.id, interaction.user.id
             )
             await interaction.followup.send(content, view=view, ephemeral=True)
+
+    @bot.tree.command(name="birthdays", description=t("command.birthdays"))
+    @app_commands.guild_only()
+    async def birthdays(interaction: discord.Interaction):
+        await interaction.response.defer(ephemeral=True)
+        rows = await bot.db.guild_birthdays(interaction.guild_id)
+        for page in birthday_list(rows):
+            await interaction.followup.send(page, ephemeral=True)
 
     admin = app_commands.Group(
         name="birthday-admin",

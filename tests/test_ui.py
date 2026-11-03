@@ -12,6 +12,7 @@ from birthdaybot.ui import (
     Dashboard,
     NoticeButton,
     TimezoneWizard,
+    birthday_list,
     notice_view,
     region_timezones,
     timezone_groups,
@@ -110,10 +111,49 @@ async def test_notice_rejects_other_users():
 
 async def test_commands_register_without_login():
     bot = BirthdayBot("postgresql://localhost/test")
-    assert {command.name for command in bot.tree.get_commands()} == {"birthday", "birthday-admin"}
+    assert {command.name for command in bot.tree.get_commands()} == {
+        "birthday",
+        "birthdays",
+        "birthday-admin",
+    }
     assert not bot.intents.members
     assert not bot.intents.message_content
     assert len(bot.tree.get_command("birthday-admin").commands) == 2
+    await bot.close()
+
+
+def test_birthday_list_formats_and_splits():
+    assert birthday_list([]) == [
+        "No birthdays are set up in this server yet. Use /birthday to add yours."
+    ]
+    rows = [
+        {"user_id": 3, "month": 1, "day": 2},
+        {"user_id": 4, "month": 1, "day": 2},
+        {"user_id": 5, "month": 12, "day": 25},
+    ]
+    assert birthday_list(rows) == [
+        "**Birthdays in this server**\n02/01: <@3>\n02/01: <@4>\n25/12: <@5>"
+    ]
+    pages = birthday_list(rows, limit=40)
+    assert pages == ["**Birthdays in this server**\n02/01: <@3>", "02/01: <@4>\n25/12: <@5>"]
+
+
+async def test_birthdays_command_lists_privately():
+    bot = BirthdayBot("postgresql://localhost/test")
+    rows = [{"user_id": 3, "month": 7, "day": 4}]
+    bot.db = SimpleNamespace(guild_birthdays=AsyncMock(return_value=rows), close=AsyncMock())
+    interaction = SimpleNamespace(
+        guild_id=1,
+        response=SimpleNamespace(defer=AsyncMock()),
+        followup=SimpleNamespace(send=AsyncMock()),
+    )
+
+    await bot.tree.get_command("birthdays").callback(interaction)
+
+    bot.db.guild_birthdays.assert_awaited_once_with(1)
+    interaction.followup.send.assert_awaited_once_with(
+        "**Birthdays in this server**\n04/07: <@3>", ephemeral=True
+    )
     await bot.close()
 
 
